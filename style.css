@@ -1,0 +1,65 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #ff9800, #ff5722);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+
+.container {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 2rem;
+  border-radius: 20px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+button {
+  background-color: #ffd600;
+  border: none;
+  color: #000;
+  padding: 10px 15px;
+  margin-top: 10px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.note {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #ffc107;
+}
+
+.fomo {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.wallet-section p {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
+.info-box {
+  margin: 1rem 0;
+}
+
+.purchase-box {
+  margin: 1rem 0;
+}
