@@ -3,8 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <title>POOL Token Presale - Wallet Connect</title>
+
+<!-- ethers.js -->
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+<!-- WalletConnect provider -->
 <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+<!-- Coinbase Wallet SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@coinbase/wallet-sdk@4.4.0/dist/CoinbaseWalletSDK.min.js"></script>
+
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -131,9 +137,16 @@
     color: white;
     user-select: none;
     transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
   .wallet-option:hover {
     background: #1d4ed8;
+  }
+  .wallet-option img {
+    width: 28px;
+    height: 28px;
   }
   .close-modal {
     margin-top: 15px;
@@ -171,10 +184,22 @@
 <div id="walletModal">
   <div class="modal-content">
     <h3>Connect Wallet</h3>
-    <div class="wallet-option" id="metaMaskBtn">MetaMask</div>
-    <div class="wallet-option" id="coinbaseBtn">Coinbase Wallet</div>
-    <div class="wallet-option" id="zerionBtn">Zerion Wallet</div>
-    <div class="wallet-option" id="walletConnectBtn">Scan QR (WalletConnect)</div>
+
+    <div class="wallet-option" id="metaMaskBtn">
+      <img src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg" alt="MetaMask" />
+      MetaMask
+    </div>
+
+    <div class="wallet-option" id="coinbaseBtn">
+      <img src="https://avatars.githubusercontent.com/u/1885080?s=200&v=4" alt="Coinbase Wallet" />
+      Coinbase Wallet
+    </div>
+
+    <div class="wallet-option" id="walletConnectBtn">
+      <img src="https://walletconnect.com/walletconnect-logo.svg" alt="WalletConnect" />
+      WalletConnect
+    </div>
+
     <div class="close-modal" id="closeModal">Cancel</div>
   </div>
 </div>
@@ -197,6 +222,7 @@
   let tokenContract;
   let userAddress;
   let walletConnectProvider;
+  let coinbaseWallet;
 
   // UI Elements
   const walletModal = document.getElementById('walletModal');
@@ -220,11 +246,11 @@
     walletModal.classList.remove('active');
   });
 
-  // Connect MetaMask
+  // MetaMask
   async function connectMetaMask() {
     walletModal.classList.remove('active');
     if (!window.ethereum || !window.ethereum.isMetaMask) {
-      alert("MetaMask not detected. Please install MetaMask.");
+      alert("MetaMask not detected. Please install MetaMask extension.");
       return;
     }
     try {
@@ -233,48 +259,47 @@
       signer = provider.getSigner();
       userAddress = await signer.getAddress();
       await afterConnect();
-    } catch (e) {
+    } catch(e) {
       alert("MetaMask connection failed: " + e.message);
     }
   }
 
-  // Connect Coinbase Wallet
+  // Coinbase Wallet
   async function connectCoinbase() {
     walletModal.classList.remove('active');
-    if (!window.ethereum || !window.ethereum.isCoinbaseWallet) {
-      alert("Coinbase Wallet not detected. Please install Coinbase Wallet extension or app.");
-      return;
-    }
     try {
-      provider = new ethers.providers.Web3Provider(window.ethereum);
+      const APP_NAME = 'POOL Token Presale';
+      const APP_LOGO_URL = 'https://pooltoken.example/logo.png'; // میتونی تغییر بدی
+      const DEFAULT_ETH_JSONRPC_URL = 'https://mainnet.infura.io/v3/INFURA_PROJECT_ID'; // اینجا شناسه اینفورا باید جایگزین بشه
+      const DEFAULT_CHAIN_ID = 1;
+
+      coinbaseWallet = new CoinbaseWalletSDK({
+        appName: APP_NAME,
+        appLogoUrl: APP_LOGO_URL,
+        darkMode: true
+      });
+
+      provider = new ethers.providers.Web3Provider(
+        coinbaseWallet.makeWeb3Provider(DEFAULT_ETH_JSONRPC_URL, DEFAULT_CHAIN_ID)
+      );
+
+      // درخواست حساب
       await provider.send("eth_requestAccounts", []);
       signer = provider.getSigner();
       userAddress = await signer.getAddress();
       await afterConnect();
+
+      // اگر کاربر اتصال را قطع کرد
+      coinbaseWallet.on('disconnect', () => {
+        resetConnection();
+      });
+
     } catch (e) {
       alert("Coinbase Wallet connection failed: " + e.message);
     }
   }
 
-  // Connect Zerion Wallet
-  async function connectZerion() {
-    walletModal.classList.remove('active');
-    if (!window.ethereum || !window.ethereum.isZerion) {
-      alert("Zerion Wallet not detected.");
-      return;
-    }
-    try {
-      provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      signer = provider.getSigner();
-      userAddress = await signer.getAddress();
-      await afterConnect();
-    } catch (e) {
-      alert("Zerion Wallet connection failed: " + e.message);
-    }
-  }
-
-  // Connect WalletConnect (for mobile wallets)
+  // WalletConnect (برای موبایل)
   async function connectWalletConnect() {
     walletModal.classList.remove('active');
     try {
@@ -283,9 +308,11 @@
           1: "https://mainnet.infura.io/v3/INFURA_PROJECT_ID",
           56: "https://bsc-dataseed.binance.org/",
           137: "https://rpc-mainnet.maticvigil.com/"
-        }
+        },
       });
+
       await walletConnectProvider.enable();
+
       provider = new ethers.providers.Web3Provider(walletConnectProvider);
       signer = provider.getSigner();
       userAddress = await signer.getAddress();
@@ -293,8 +320,9 @@
       walletConnectProvider.on("disconnect", () => {
         resetConnection();
       });
+
       await afterConnect();
-    } catch (e) {
+    } catch(e) {
       alert("WalletConnect connection failed: " + e.message);
     }
   }
@@ -309,7 +337,6 @@
     await loadBalances();
     await loadRate();
 
-    // Listen for account or chain changes
     if(window.ethereum && window.ethereum.on) {
       window.ethereum.on('accountsChanged', async (accounts) => {
         if(accounts.length === 0) {
@@ -340,6 +367,10 @@
     if(walletConnectProvider) {
       walletConnectProvider.disconnect();
       walletConnectProvider = null;
+    }
+    if(coinbaseWallet) {
+      coinbaseWallet.disconnect();
+      coinbaseWallet = null;
     }
   }
 
@@ -407,12 +438,10 @@
     }
   }
 
-  // Attach button handlers for wallet modal options
+  // Button event listeners
   document.getElementById('metaMaskBtn').addEventListener('click', connectMetaMask);
   document.getElementById('coinbaseBtn').addEventListener('click', connectCoinbase);
-  document.getElementById('zerionBtn').addEventListener('click', connectZerion);
   document.getElementById('walletConnectBtn').addEventListener('click', connectWalletConnect);
-
   buyBtn.addEventListener('click', buyTokens);
 
 </script>
