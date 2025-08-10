@@ -4,87 +4,72 @@
 <meta charset="UTF-8" />
 <title>POOL Token Presale - Wallet Connect</title>
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-<!-- WalletConnect Core -->
 <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
   body {
-    font-family: 'Poppins', Arial, sans-serif;
-    background: linear-gradient(135deg, #0f172a, #1e293b);
+    font-family: Arial, sans-serif;
+    background: #0f172a;
     color: white;
-    padding: 0; margin: 0;
-    min-height: 100vh;
+    margin: 0; padding: 0;
     display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh;
   }
   header {
     width: 100%;
-    display: flex; justify-content: flex-end;
-    padding: 15px 30px;
     background: #1e293b;
+    padding: 15px 30px;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-    position: sticky; top: 0; z-index: 10;
+    display: flex;
+    justify-content: flex-end;
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
   header button {
-    background: linear-gradient(270deg, #2563eb, #1d4ed8, #3b82f6);
-    background-size: 600% 600%;
-    color: white;
-    border: none; border-radius: 20px;
+    background: #2563eb;
+    border: none;
+    border-radius: 12px;
     padding: 10px 24px;
-    font-size: 15px; font-weight: 600;
+    font-size: 15px;
+    color: white;
     cursor: pointer;
-    box-shadow: 0 0 10px #2563ebaa;
-    transition: background-position 3s ease infinite;
-    animation: gradientShift 8s ease infinite;
+    transition: background-color 0.3s ease;
   }
   header button:hover {
-    background-position: 100% 0;
-    box-shadow: 0 0 20px #3b82f6cc;
-  }
-  @keyframes gradientShift {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
+    background: #1d4ed8;
   }
   main {
-    flex: 1; width: 100%; max-width: 420px;
+    flex: 1;
+    max-width: 420px;
+    width: 100%;
     padding: 40px 20px;
-    display: flex; justify-content: center; align-items: center;
+    box-sizing: border-box;
   }
   .card {
-    background: #152238;
-    padding: 35px 30px;
-    border-radius: 18px;
+    background: #1e293b;
+    padding: 30px;
+    border-radius: 16px;
     box-shadow: 0 10px 30px rgba(37, 99, 235, 0.6);
     text-align: center;
-    width: 100%;
   }
   h2 {
-    margin-bottom: 20px;
-    font-weight: 700;
-    font-size: 28px;
-    letter-spacing: 1.2px;
     color: #60a5fa;
-    text-shadow: 0 0 8px #3b82f6aa;
+    margin-bottom: 20px;
   }
   p {
     margin: 12px 0;
-    font-weight: 500;
-    font-size: 16px;
-    color: #cbd5e1;
-    user-select: none;
   }
   input[type=number] {
     width: 180px;
-    padding: 12px 15px;
-    margin-top: 15px;
+    padding: 10px;
     font-size: 16px;
-    border-radius: 12px;
+    border-radius: 8px;
     border: none;
     outline: none;
-    background: #1e293b;
+    margin-top: 15px;
+    background: #0f172a;
     color: white;
     box-shadow: inset 0 0 5px #2563ebaa;
-    transition: box-shadow 0.3s ease;
   }
   input[type=number]:focus {
     box-shadow: 0 0 12px #3b82f6cc;
@@ -93,28 +78,24 @@
     margin-top: 20px;
     padding: 14px 30px;
     font-size: 18px;
-    font-weight: 600;
     border-radius: 24px;
     border: none;
-    background: linear-gradient(90deg, #2563eb, #3b82f6);
+    background: #2563eb;
     color: white;
     cursor: pointer;
-    box-shadow: 0 0 12px #2563ebcc;
-    transition: background 0.3s ease, box-shadow 0.3s ease;
   }
   button.buyBtn:hover {
-    background: linear-gradient(90deg, #1d4ed8, #2563eb);
-    box-shadow: 0 0 25px #3b82f6dd;
+    background: #1d4ed8;
   }
   #status {
     margin-top: 18px;
     font-weight: 600;
-    min-height: 24px;
     font-size: 15px;
-    color: #facc15;
+    min-height: 24px;
     user-select: none;
   }
-  /* Modal styles */
+
+  /* Modal */
   #walletModal {
     position: fixed;
     inset: 0;
@@ -130,7 +111,7 @@
   .modal-content {
     background: #1e293b;
     border-radius: 16px;
-    padding: 30px 25px;
+    padding: 25px 20px;
     max-width: 320px;
     width: 90%;
     box-shadow: 0 0 25px #2563ebcc;
@@ -147,9 +128,9 @@
     border-radius: 14px;
     cursor: pointer;
     font-weight: 600;
-    transition: background 0.3s ease;
-    box-shadow: 0 0 10px #3b82f6cc;
+    color: white;
     user-select: none;
+    transition: background-color 0.3s ease;
   }
   .wallet-option:hover {
     background: #1d4ed8;
@@ -181,12 +162,12 @@
 
     <input type="number" id="ethAmount" placeholder="ETH amount (≥0.02)" min="0.02" step="0.001" />
     <br />
-    <button class="buyBtn" onclick="buyTokens()">Buy Tokens</button>
+    <button class="buyBtn" id="buyBtn">Buy Tokens</button>
     <p id="status"></p>
   </div>
 </main>
 
-<!-- Wallet Connect Modal -->
+<!-- Wallet Modal -->
 <div id="walletModal">
   <div class="modal-content">
     <h3>Connect Wallet</h3>
@@ -203,24 +184,21 @@
   const tokenAddress = "0xd8b10C6D44F0A37aeE038B75C59d72a0634840E7";
 
   const abi = [
-      { "inputs": [{ "internalType": "address", "name": "tokenAddress", "type": "address" }], "stateMutability": "nonpayable", "type": "constructor" },
-      { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "buyer", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "amountETH", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "amountTokens", "type": "uint256" }], "name": "TokensPurchased", "type": "event" },
-      { "inputs": [], "name": "buyTokens", "outputs": [], "stateMutability": "payable", "type": "function" },
-      { "inputs": [], "name": "token", "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" },
-      { "inputs": [], "name": "TOKENS_PER_ETHER", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }
+    {"inputs":[{"internalType":"address","name":"tokenAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+    {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amountETH","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amountTokens","type":"uint256"}],"name":"TokensPurchased","type":"event"},
+    {"inputs":[],"name":"buyTokens","outputs":[],"stateMutability":"payable","type":"function"},
+    {"inputs":[],"name":"token","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+    {"inputs":[],"name":"TOKENS_PER_ETHER","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
   ];
 
-  let provider, signer, presaleContract, tokenContract, userAddress;
-
-  // WalletConnect provider instance
+  let provider;
+  let signer;
+  let presaleContract;
+  let tokenContract;
+  let userAddress;
   let walletConnectProvider;
 
-  // Utility to shorten address for UI
-  function shortenAddress(addr) {
-      return addr.slice(0, 6) + '...' + addr.slice(-4);
-  }
-
-  // UI elements
+  // UI Elements
   const walletModal = document.getElementById('walletModal');
   const connectBtn = document.getElementById('connectBtn');
   const walletAddressEl = document.getElementById('walletAddress');
@@ -228,6 +206,11 @@
   const contractBalanceEl = document.getElementById('contractBalance');
   const rateInfoEl = document.getElementById('rateInfo');
   const statusEl = document.getElementById('status');
+  const buyBtn = document.getElementById('buyBtn');
+
+  function shortenAddress(addr) {
+    return addr.slice(0,6) + "..." + addr.slice(-4);
+  }
 
   connectBtn.addEventListener('click', () => {
     walletModal.classList.add('active');
@@ -237,101 +220,87 @@
     walletModal.classList.remove('active');
   });
 
-  // Connect MetaMask (or any injected ethereum)
+  // Connect MetaMask
   async function connectMetaMask() {
     walletModal.classList.remove('active');
-    if (window.ethereum && window.ethereum.isMetaMask) {
-      try {
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        signer = provider.getSigner();
-        userAddress = await signer.getAddress();
-
-        afterConnect();
-      } catch (err) {
-        alert("MetaMask connection failed: " + (err.message || err));
-      }
-    } else {
+    if (!window.ethereum || !window.ethereum.isMetaMask) {
       alert("MetaMask not detected. Please install MetaMask.");
+      return;
+    }
+    try {
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      signer = provider.getSigner();
+      userAddress = await signer.getAddress();
+      await afterConnect();
+    } catch (e) {
+      alert("MetaMask connection failed: " + e.message);
     }
   }
 
   // Connect Coinbase Wallet
   async function connectCoinbase() {
     walletModal.classList.remove('active');
-    if (window.ethereum) {
-      // Coinbase Wallet injects ethereum but can be detected differently
-      // Check for Coinbase Wallet (some versions set isCoinbaseWallet = true)
-      if(window.ethereum.isCoinbaseWallet) {
-        try {
-          provider = new ethers.providers.Web3Provider(window.ethereum);
-          await provider.send("eth_requestAccounts", []);
-          signer = provider.getSigner();
-          userAddress = await signer.getAddress();
-
-          afterConnect();
-          return;
-        } catch (err) {
-          alert("Coinbase Wallet connection failed: " + (err.message || err));
-          return;
-        }
-      }
+    if (!window.ethereum || !window.ethereum.isCoinbaseWallet) {
+      alert("Coinbase Wallet not detected. Please install Coinbase Wallet extension or app.");
+      return;
     }
-    alert("Coinbase Wallet not detected in your browser.");
+    try {
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      signer = provider.getSigner();
+      userAddress = await signer.getAddress();
+      await afterConnect();
+    } catch (e) {
+      alert("Coinbase Wallet connection failed: " + e.message);
+    }
   }
 
-  // Connect Zerion Wallet (injected ethereum)
+  // Connect Zerion Wallet
   async function connectZerion() {
     walletModal.classList.remove('active');
-    if (window.ethereum && window.ethereum.isZerion) {
-      try {
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        signer = provider.getSigner();
-        userAddress = await signer.getAddress();
-
-        afterConnect();
-      } catch (err) {
-        alert("Zerion Wallet connection failed: " + (err.message || err));
-      }
-    } else {
+    if (!window.ethereum || !window.ethereum.isZerion) {
       alert("Zerion Wallet not detected.");
+      return;
+    }
+    try {
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      signer = provider.getSigner();
+      userAddress = await signer.getAddress();
+      await afterConnect();
+    } catch (e) {
+      alert("Zerion Wallet connection failed: " + e.message);
     }
   }
 
-  // Connect WalletConnect (for mobile wallets via QR)
+  // Connect WalletConnect (for mobile wallets)
   async function connectWalletConnect() {
     walletModal.classList.remove('active');
     try {
       walletConnectProvider = new WalletConnectProvider.default({
         rpc: {
-          1: "https://mainnet.infura.io/v3/your-infura-id", // جایگزین کن با Infura یا RPC دلخواه
+          1: "https://mainnet.infura.io/v3/INFURA_PROJECT_ID",
           56: "https://bsc-dataseed.binance.org/",
           137: "https://rpc-mainnet.maticvigil.com/"
-        },
-        chainId: 1,
+        }
       });
-
       await walletConnectProvider.enable();
-
       provider = new ethers.providers.Web3Provider(walletConnectProvider);
       signer = provider.getSigner();
       userAddress = await signer.getAddress();
 
-      // وقتی WalletConnect وصل شد، باید رویداد قطع اتصال گوش بدیم
-      walletConnectProvider.on("disconnect", (code, reason) => {
+      walletConnectProvider.on("disconnect", () => {
         resetConnection();
       });
-
-      afterConnect();
-    } catch (err) {
-      alert("WalletConnect connection failed: " + (err.message || err));
+      await afterConnect();
+    } catch (e) {
+      alert("WalletConnect connection failed: " + e.message);
     }
   }
 
-  // بعد از اتصال به هر کیف پول مشترک
   async function afterConnect() {
-    walletAddressEl.innerText = `Wallet: ${shortenAddress(userAddress)}`;
+    walletAddressEl.innerText = "Wallet: " + shortenAddress(userAddress);
     connectBtn.innerText = "Connected";
     connectBtn.disabled = true;
     connectBtn.style.cursor = "default";
@@ -340,15 +309,15 @@
     await loadBalances();
     await loadRate();
 
-    // گوش دادن به تغییر حساب در متامسک یا کیف پول inject شده
-    if (window.ethereum && window.ethereum.on) {
-      window.ethereum.on('accountsChanged', (accounts) => {
-        if (accounts.length === 0) {
+    // Listen for account or chain changes
+    if(window.ethereum && window.ethereum.on) {
+      window.ethereum.on('accountsChanged', async (accounts) => {
+        if(accounts.length === 0) {
           resetConnection();
         } else {
           userAddress = accounts[0];
-          walletAddressEl.innerText = `Wallet: ${shortenAddress(userAddress)}`;
-          loadBalances();
+          walletAddressEl.innerText = "Wallet: " + shortenAddress(userAddress);
+          await loadBalances();
         }
       });
       window.ethereum.on('chainChanged', () => {
@@ -379,10 +348,10 @@
       const tokensPerEther = await presaleContract.TOKENS_PER_ETHER();
       const decimals = await getTokenDecimals();
       const formattedRate = ethers.utils.formatUnits(tokensPerEther, decimals);
-      rateInfoEl.innerText = `Rate: 1 ETH = ${formattedRate} POOL`;
-    } catch (err) {
-      console.error(err);
+      rateInfoEl.innerText = "Rate: 1 ETH = " + formattedRate + " POOL";
+    } catch (e) {
       rateInfoEl.innerText = "Rate: Error loading";
+      console.error(e);
     }
   }
 
@@ -393,7 +362,7 @@
   }
 
   async function loadBalances() {
-    if (!userAddress) return;
+    if(!userAddress) return;
     try {
       const tokenAbi = [
         "function balanceOf(address) view returns (uint256)",
@@ -403,29 +372,50 @@
 
       const decimals = await tokenContract.decimals();
       const userBal = await tokenContract.balanceOf(userAddress);
-      userBalanceEl.innerText = `Your POOL Balance: ${ethers.utils.formatUnits(userBal, decimals)}`;
+      userBalanceEl.innerText = "Your POOL Balance: " + ethers.utils.formatUnits(userBal, decimals);
 
       const contractBal = await tokenContract.balanceOf(contractAddress);
-      contractBalanceEl.innerText = `Tokens Left in Presale: ${ethers.utils.formatUnits(contractBal, decimals)}`;
-    } catch (error) {
-      console.error(error);
+      contractBalanceEl.innerText = "Tokens Left in Presale: " + ethers.utils.formatUnits(contractBal, decimals);
+    } catch (e) {
+      console.error(e);
       userBalanceEl.innerText = "Your POOL Balance: Error";
       contractBalanceEl.innerText = "Tokens Left in Presale: Error";
     }
   }
 
   async function buyTokens() {
-    if (!userAddress) {
+    if(!userAddress) {
       alert("Please connect your wallet first!");
       return;
     }
-    const ethAmount = document.getElementById("ethAmount").value;
-    if (!ethAmount || ethAmount < 0.02) {
+    const ethAmount = document.getElementById('ethAmount').value;
+    if(!ethAmount || ethAmount < 0.02) {
       alert("Minimum purchase is 0.02 ETH");
       return;
     }
     try {
-      statusEl.style.color = '#facc15'; // yellow
+      statusEl.style.color = "#facc15";
       statusEl.innerText = "Transaction sent. Waiting for confirmation...";
       const tx = await presaleContract.buyTokens({ value: ethers.utils.parseEther(ethAmount) });
-      await tx.wait
+      await tx.wait();
+      statusEl.style.color = "#4ade80"; // green
+      statusEl.innerText = "Purchase successful!";
+      await loadBalances();
+    } catch (e) {
+      statusEl.style.color = "#f87171"; // red
+      statusEl.innerText = "Transaction failed: " + e.message;
+    }
+  }
+
+  // Attach button handlers for wallet modal options
+  document.getElementById('metaMaskBtn').addEventListener('click', connectMetaMask);
+  document.getElementById('coinbaseBtn').addEventListener('click', connectCoinbase);
+  document.getElementById('zerionBtn').addEventListener('click', connectZerion);
+  document.getElementById('walletConnectBtn').addEventListener('click', connectWalletConnect);
+
+  buyBtn.addEventListener('click', buyTokens);
+
+</script>
+
+</body>
+</html>
