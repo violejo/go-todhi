@@ -4,9 +4,110 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>POOL Token Presale</title>
-<link rel="stylesheet" href="style.css" />
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+    margin: 0;
+    padding: 40px 20px;
+  }
+
+  header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 20px;
+    background: #1e293b;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  header button {
+    padding: 8px 20px;
+    font-size: 14px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  header button:hover {
+    background: #1d4ed8;
+  }
+
+  main {
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .card {
+    background: #1e293b;
+    padding: 30px 25px;
+    border-radius: 16px;
+    max-width: 400px;
+    margin: 0 auto;
+    box-shadow: 0 0 20px #2563ebaa;
+  }
+
+  .card h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+
+  input[type="number"] {
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    width: 180px;
+    margin-top: 20px;
+  }
+
+  button#buyBtn {
+    margin-top: 15px;
+    padding: 12px 28px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button#buyBtn:disabled {
+    background: #4b5563;
+    cursor: not-allowed;
+  }
+
+  button#buyBtn:hover:not(:disabled) {
+    background: #1d4ed8;
+  }
+
+  p {
+    font-size: 16px;
+    margin: 12px 0;
+  }
+
+  #status {
+    margin-top: 16px;
+    min-height: 24px;
+    font-weight: 600;
+    color: #60a5fa;
+  }
+</style>
+
+<!-- لود کتابخانه ethers.js -->
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+
+<!-- لود WalletConnect -->
 <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+
 </head>
 <body>
 
@@ -28,6 +129,7 @@
       placeholder="ETH amount (≥ 0.02)"
       min="0.02"
       step="0.001"
+      disabled
     />
     <br />
     <button id="buyBtn" disabled>Buy Tokens</button>
@@ -37,21 +139,18 @@
 </main>
 
 <script>
-  // --- تنظیمات کانترکت و شبکه ---
   const contractAddress = "0x7a1Ed548e5407Ec09937e467A90ca2Bc72A943E1";
   const tokenAddress = "0xd8b10C6D44F0A37aeE038B75C59d72a0634840E7";
-  const BASE_CHAIN_ID_HEX = "0x2105"; // Base Mainnet
+  const BASE_CHAIN_ID_HEX = "0x2105"; // Base Mainnet chainId in hex
 
-  // ABI کانترکت پری‌سل (فقط توابع مورد نیاز)
   const presaleAbi = [
     "function TOKENS_PER_ETHER() view returns (uint256)",
-    "function buyTokens() payable",
+    "function buyTokens() payable"
   ];
 
-  // ABI توکن ERC20 (برای بالانس و decimals)
   const tokenAbi = [
     "function balanceOf(address) view returns (uint256)",
-    "function decimals() view returns (uint8)",
+    "function decimals() view returns (uint8)"
   ];
 
   let provider;
@@ -70,12 +169,10 @@
   const buyBtn = document.getElementById("buyBtn");
   const ethAmountInput = document.getElementById("ethAmount");
 
-  // کمک برای کوتاه کردن آدرس
   function shortenAddress(address) {
     return address.slice(0, 6) + "..." + address.slice(-4);
   }
 
-  // تغییر شبکه به Base در کیف پول (MetaMask)
   async function switchToBaseNetwork() {
     if (!window.ethereum) return false;
     try {
@@ -83,13 +180,12 @@
       if (chainId !== BASE_CHAIN_ID_HEX) {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: BASE_CHAIN_ID_HEX }],
+          params: [{ chainId: BASE_CHAIN_ID_HEX }]
         });
       }
       return true;
     } catch (error) {
       if (error.code === 4902) {
-        // اضافه کردن شبکه اگر وجود نداشت
         try {
           await window.ethereum.request({
             method: "wallet_addEthereumChain",
@@ -98,14 +194,10 @@
                 chainId: BASE_CHAIN_ID_HEX,
                 chainName: "Base Mainnet",
                 rpcUrls: ["https://base-mainnet.public.blastapi.io"],
-                nativeCurrency: {
-                  name: "Ether",
-                  symbol: "ETH",
-                  decimals: 18,
-                },
-                blockExplorerUrls: ["https://basescan.org"],
-              },
-            ],
+                nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+                blockExplorerUrls: ["https://basescan.org"]
+              }
+            ]
           });
           return true;
         } catch (addError) {
@@ -118,11 +210,10 @@
     }
   }
 
-  // اتصال کیف پول (MetaMask یا WalletConnect)
   async function connectWallet() {
     statusEl.textContent = "";
     if (window.ethereum) {
-      // MetaMask یا هر کیف پول inject شده
+      // MetaMask یا کیف پول‌های inject شده
       const switched = await switchToBaseNetwork();
       if (!switched) return;
 
@@ -137,19 +228,20 @@
 
         walletAddressEl.textContent = "Wallet: " + shortenAddress(userAddress);
 
+        ethAmountInput.disabled = false;
+        buyBtn.disabled = false;
+
         await loadRate();
         await loadBalances();
-        buyBtn.disabled = false;
+
       } catch (error) {
         alert("Wallet connection failed: " + error.message);
       }
     } else {
-      // اگر متامسک ندارید WalletConnect باز می‌کنیم
+      // WalletConnect (موبایل و کیف پول‌های غیر متامسک)
       walletConnectProvider = new WalletConnectProvider.default({
-        rpc: {
-          8453: "https://base-mainnet.public.blastapi.io",
-        },
-        chainId: 8453,
+        rpc: { 8453: "https://base-mainnet.public.blastapi.io" },
+        chainId: 8453
       });
       try {
         await walletConnectProvider.enable();
@@ -162,9 +254,11 @@
 
         walletAddressEl.textContent = "Wallet: " + shortenAddress(userAddress);
 
+        ethAmountInput.disabled = false;
+        buyBtn.disabled = false;
+
         await loadRate();
         await loadBalances();
-        buyBtn.disabled = false;
 
         walletConnectProvider.on("disconnect", () => {
           resetUI();
@@ -175,7 +269,6 @@
     }
   }
 
-  // بارگذاری نرخ تبدیل
   async function loadRate() {
     try {
       const tokensPerEther = await presaleContract.TOKENS_PER_ETHER();
@@ -187,7 +280,6 @@
     }
   }
 
-  // بارگذاری موجودی‌ها
   async function loadBalances() {
     try {
       const decimals = await tokenContract.decimals();
@@ -204,7 +296,6 @@
     }
   }
 
-  // خرید توکن
   async function buyTokens() {
     statusEl.textContent = "";
     let ethAmount = ethAmountInput.value;
@@ -216,7 +307,7 @@
       buyBtn.disabled = true;
       statusEl.textContent = "Sending transaction...";
       const tx = await presaleContract.buyTokens({
-        value: ethers.utils.parseEther(ethAmount),
+        value: ethers.utils.parseEther(ethAmount)
       });
       await tx.wait();
       statusEl.textContent = "Purchase successful!";
@@ -228,20 +319,20 @@
     }
   }
 
-  // ریست UI هنگام قطع اتصال
   function resetUI() {
     walletAddressEl.textContent = "Wallet: Not connected";
     userBalanceEl.textContent = "Your POOL Balance: 0";
     contractBalanceEl.textContent = "Tokens Left in Presale: 0";
     rateInfoEl.textContent = "Rate: Loading...";
     statusEl.textContent = "";
+    ethAmountInput.value = "";
+    ethAmountInput.disabled = true;
     buyBtn.disabled = true;
   }
 
   connectWalletBtn.addEventListener("click", connectWallet);
   buyBtn.addEventListener("click", buyTokens);
 
-  // استارت اولیه UI ریست
   resetUI();
 </script>
 
