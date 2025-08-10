@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Test ethers</title>
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <meta charset="UTF-8" />
+  <title>Test ethers</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
 </head>
-<body>
-<script>
-  console.log("Ethers version:", ethers.version);
-</script>
+<body style="background:#0f172a; color:#fff; font-family:Arial,sans-serif; padding:40px;">
+  <h1>Testing ethers.js Load</h1>
+  <p id="status">Loading ethers version...</p>
+
+  <script>
+    if (typeof ethers !== "undefined") {
+      document.getElementById("status").textContent = "Ethers.js loaded! Version: " + ethers.version;
+      console.log("Ethers is loaded, version:", ethers.version);
+    } else {
+      document.getElementById("status").textContent = "Ethers is NOT loaded!";
+      console.error("Ethers is NOT loaded!");
+    }
+  </script>
 </body>
 </html>
