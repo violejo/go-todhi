@@ -2,21 +2,134 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Test ethers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GoToshi Token Presale</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 10px #2563ebaa;
+    }
+    button {
+      background: #2563eb;
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 12px;
+      width: 100%;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+    }
+    p.note {
+      font-size: 12px;
+      margin-top: 15px;
+      opacity: 0.7;
+    }
+    #walletAddress {
+      margin-top: 15px;
+      font-weight: bold;
+      word-break: break-all;
+    }
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
 </head>
-<body style="background:#0f172a; color:#fff; font-family:Arial,sans-serif; padding:40px;">
-  <h1>Testing ethers.js Load</h1>
-  <p id="status">Loading ethers version...</p>
+<body>
+  <div class="container">
+    <h1>🚀 GoToshi Token Presale</h1>
+    <button id="connectWallet">🔗 Connect Wallet</button>
+    <p id="walletAddress">Not connected</p>
+
+    <input type="number" id="ethAmount" placeholder="Amount in ETH (min 0.02)" min="0.02" step="0.001" />
+    <button id="buyTokens">Buy Tokens</button>
+
+    <p id="status" class="note"></p>
+    <p class="note">This is a demo presale site. Use responsibly.</p>
+  </div>
 
   <script>
-    if (typeof ethers !== "undefined") {
-      document.getElementById("status").textContent = "Ethers.js loaded! Version: " + ethers.version;
-      console.log("Ethers is loaded, version:", ethers.version);
-    } else {
-      document.getElementById("status").textContent = "Ethers is NOT loaded!";
-      console.error("Ethers is NOT loaded!");
-    }
+    const contractAddress = "0x7a1Ed548e5407Ec09937e467A90ca2Bc72A943E1";
+    const abi = [
+      {"inputs":[{"internalType":"address","name":"tokenAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+      {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":false,"internalType":"uint256","name":"amountETH","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amountTokens","type":"uint256"}],"name":"TokensPurchased","type":"event"},
+      {"inputs":[],"name":"buyTokens","outputs":[],"stateMutability":"payable","type":"function"},
+      {"inputs":[],"name":"token","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+      {"inputs":[],"name":"TOKENS_PER_ETHER","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}
+    ];
+
+    let provider;
+    let signer;
+    let presaleContract;
+    let userAddress;
+
+    const connectBtn = document.getElementById('connectWallet');
+    const walletAddressP = document.getElementById('walletAddress');
+    const buyBtn = document.getElementById('buyTokens');
+    const ethInput = document.getElementById('ethAmount');
+    const statusP = document.getElementById('status');
+
+    connectBtn.onclick = async () => {
+      if (typeof window.ethereum === 'undefined') {
+        alert("Please install MetaMask or another wallet!");
+        return;
+      }
+      try {
+        provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+        // درخواست اتصال
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        userAddress = await signer.getAddress();
+        walletAddressP.textContent = "Connected: " + userAddress;
+        connectBtn.textContent = "Wallet Connected";
+        presaleContract = new ethers.Contract(contractAddress, abi, signer);
+        statusP.textContent = "";
+      } catch (err) {
+        console.error(err);
+        statusP.textContent = "Wallet connection failed: " + err.message;
+      }
+    };
+
+    buyBtn.onclick = async () => {
+      if (!presaleContract) {
+        alert("Please connect your wallet first.");
+        return;
+      }
+      let ethValue = ethInput.value;
+      if (!ethValue || ethValue < 0.02) {
+        alert("Minimum purchase is 0.02 ETH.");
+        return;
+      }
+      try {
+        statusP.textContent = "Sending transaction...";
+        const tx = await presaleContract.buyTokens({ value: ethers.utils.parseEther(ethValue) });
+        await tx.wait();
+        statusP.textContent = "Purchase successful! Tx Hash: " + tx.hash;
+      } catch (error) {
+        console.error(error);
+        statusP.textContent = "Transaction failed: " + error.message;
+      }
+    };
   </script>
 </body>
 </html>
