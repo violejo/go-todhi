@@ -2,211 +2,85 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>POOL Token Presale - Wallet Connect</title>
-
-<!-- ethers.js -->
+<title>POOL Token Presale on Base Network</title>
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-<!-- WalletConnect provider -->
 <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-<!-- Coinbase Wallet SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@coinbase/wallet-sdk@4.4.0/dist/CoinbaseWalletSDK.min.js"></script>
-
 <style>
   body {
     font-family: Arial, sans-serif;
     background: #0f172a;
     color: white;
-    margin: 0; padding: 0;
-    display: flex; flex-direction: column; align-items: center;
-    min-height: 100vh;
+    margin: 0;
+    padding: 40px 20px;
+    text-align: center;
   }
-  header {
-    width: 100%;
-    background: #1e293b;
-    padding: 15px 30px;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-    display: flex;
-    justify-content: flex-end;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-  header button {
-    background: #2563eb;
-    border: none;
+  button {
+    padding: 14px 28px;
+    font-size: 16px;
+    margin: 10px;
     border-radius: 12px;
-    padding: 10px 24px;
-    font-size: 15px;
+    border: none;
+    background: #2563eb;
     color: white;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
-  header button:hover {
+  button:hover {
     background: #1d4ed8;
   }
-  main {
-    flex: 1;
-    max-width: 420px;
-    width: 100%;
-    padding: 40px 20px;
-    box-sizing: border-box;
+  input[type=number] {
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    width: 180px;
+    margin-top: 20px;
   }
   .card {
     background: #1e293b;
-    padding: 30px;
     border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.6);
-    text-align: center;
-  }
-  h2 {
-    color: #60a5fa;
-    margin-bottom: 20px;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    box-shadow: 0 0 20px #2563ebaa;
   }
   p {
+    font-size: 16px;
     margin: 12px 0;
   }
-  input[type=number] {
-    width: 180px;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    margin-top: 15px;
-    background: #0f172a;
-    color: white;
-    box-shadow: inset 0 0 5px #2563ebaa;
-  }
-  input[type=number]:focus {
-    box-shadow: 0 0 12px #3b82f6cc;
-  }
-  button.buyBtn {
-    margin-top: 20px;
-    padding: 14px 30px;
-    font-size: 18px;
-    border-radius: 24px;
-    border: none;
-    background: #2563eb;
-    color: white;
-    cursor: pointer;
-  }
-  button.buyBtn:hover {
-    background: #1d4ed8;
-  }
   #status {
-    margin-top: 18px;
-    font-weight: 600;
-    font-size: 15px;
+    margin-top: 16px;
     min-height: 24px;
-    user-select: none;
-  }
-
-  /* Modal */
-  #walletModal {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.9);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-  }
-  #walletModal.active {
-    display: flex;
-  }
-  .modal-content {
-    background: #1e293b;
-    border-radius: 16px;
-    padding: 25px 20px;
-    max-width: 320px;
-    width: 90%;
-    box-shadow: 0 0 25px #2563ebcc;
-    text-align: center;
-  }
-  .modal-content h3 {
-    margin-bottom: 20px;
-    color: #60a5fa;
-  }
-  .wallet-option {
-    background: #2563eb;
-    margin: 10px 0;
-    padding: 14px 20px;
-    border-radius: 14px;
-    cursor: pointer;
     font-weight: 600;
-    color: white;
-    user-select: none;
-    transition: background-color 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .wallet-option:hover {
-    background: #1d4ed8;
-  }
-  .wallet-option img {
-    width: 28px;
-    height: 28px;
-  }
-  .close-modal {
-    margin-top: 15px;
-    font-weight: 500;
-    color: #cbd5e1;
-    cursor: pointer;
-    font-size: 14px;
-    text-decoration: underline;
-    user-select: none;
   }
 </style>
 </head>
 <body>
 
-<header>
-  <button id="connectBtn">Connect Wallet</button>
-</header>
+<div class="card">
+  <h2>POOL Token Presale</h2>
+  <button id="connectMetaMaskBtn">Connect MetaMask</button>
+  <button id="connectWalletConnectBtn">Connect WalletConnect</button>
 
-<main>
-  <div class="card">
-    <h2>POOL Token Presale</h2>
-    <p id="walletAddress">Wallet: Not connected</p>
-    <p id="userBalance">Your POOL Balance: 0</p>
-    <p id="contractBalance">Tokens Left in Presale: 0</p>
-    <p id="rateInfo">Rate: Loading...</p>
+  <p id="walletAddress">Wallet: Not connected</p>
+  <p id="userBalance">Your POOL Balance: 0</p>
+  <p id="contractBalance">Tokens Left in Presale: 0</p>
+  <p id="rateInfo">Rate: Loading...</p>
 
-    <input type="number" id="ethAmount" placeholder="ETH amount (≥0.02)" min="0.02" step="0.001" />
-    <br />
-    <button class="buyBtn" id="buyBtn">Buy Tokens</button>
-    <p id="status"></p>
-  </div>
-</main>
+  <input type="number" id="ethAmount" placeholder="ETH amount (≥0.02)" min="0.02" step="0.001" />
+  <br />
+  <button id="buyBtn">Buy Tokens</button>
 
-<!-- Wallet Modal -->
-<div id="walletModal">
-  <div class="modal-content">
-    <h3>Connect Wallet</h3>
-
-    <div class="wallet-option" id="metaMaskBtn">
-      <img src="https://raw.githubusercontent.com/MetaMask/brand-resources/master/SVG/metamask-fox.svg" alt="MetaMask" />
-      MetaMask
-    </div>
-
-    <div class="wallet-option" id="coinbaseBtn">
-      <img src="https://avatars.githubusercontent.com/u/1885080?s=200&v=4" alt="Coinbase Wallet" />
-      Coinbase Wallet
-    </div>
-
-    <div class="wallet-option" id="walletConnectBtn">
-      <img src="https://walletconnect.com/walletconnect-logo.svg" alt="WalletConnect" />
-      WalletConnect
-    </div>
-
-    <div class="close-modal" id="closeModal">Cancel</div>
-  </div>
+  <p id="status"></p>
 </div>
 
 <script>
   const contractAddress = "0x7a1Ed548e5407Ec09937e467A90ca2Bc72A943E1";
   const tokenAddress = "0xd8b10C6D44F0A37aeE038B75C59d72a0634840E7";
+
+  const BASE_RPC_URL = "https://base-mainnet.public.blastapi.io";
+  const BASE_CHAIN_ID = 8453; // Base network chainId decimal
+  const BASE_CHAIN_ID_HEX = '0x2105'; // hex chainId for wallet_switchEthereumChain
 
   const abi = [
     {"inputs":[{"internalType":"address","name":"tokenAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
@@ -222,228 +96,175 @@
   let tokenContract;
   let userAddress;
   let walletConnectProvider;
-  let coinbaseWallet;
 
-  // UI Elements
-  const walletModal = document.getElementById('walletModal');
-  const connectBtn = document.getElementById('connectBtn');
-  const walletAddressEl = document.getElementById('walletAddress');
-  const userBalanceEl = document.getElementById('userBalance');
-  const contractBalanceEl = document.getElementById('contractBalance');
-  const rateInfoEl = document.getElementById('rateInfo');
-  const statusEl = document.getElementById('status');
-  const buyBtn = document.getElementById('buyBtn');
+  const walletAddressEl = document.getElementById("walletAddress");
+  const userBalanceEl = document.getElementById("userBalance");
+  const contractBalanceEl = document.getElementById("contractBalance");
+  const rateInfoEl = document.getElementById("rateInfo");
+  const statusEl = document.getElementById("status");
+  const buyBtn = document.getElementById("buyBtn");
 
   function shortenAddress(addr) {
     return addr.slice(0,6) + "..." + addr.slice(-4);
   }
 
-  connectBtn.addEventListener('click', () => {
-    walletModal.classList.add('active');
-  });
+  async function switchToBaseNetwork() {
+    if (!window.ethereum) return;
+    try {
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      if (chainId !== BASE_CHAIN_ID_HEX) {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: BASE_CHAIN_ID_HEX }]
+        });
+      }
+    } catch (switchError) {
+      if (switchError.code === 4902) {
+        // شبکه وجود ندارد، اضافه کن
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: BASE_CHAIN_ID_HEX,
+              chainName: 'Base Mainnet',
+              rpcUrls: [BASE_RPC_URL],
+              nativeCurrency: {
+                name: 'Ether',
+                symbol: 'ETH',
+                decimals: 18
+              },
+              blockExplorerUrls: ['https://basescan.org']
+            }]
+          });
+        } catch (addError) {
+          alert('Failed to add Base network: ' + addError.message);
+        }
+      } else {
+        alert('Failed to switch network: ' + switchError.message);
+      }
+    }
+  }
 
-  document.getElementById('closeModal').addEventListener('click', () => {
-    walletModal.classList.remove('active');
-  });
-
-  // MetaMask
   async function connectMetaMask() {
-    walletModal.classList.remove('active');
-    if (!window.ethereum || !window.ethereum.isMetaMask) {
-      alert("MetaMask not detected. Please install MetaMask extension.");
+    if (!window.ethereum) {
+      alert("MetaMask is not installed!");
       return;
     }
     try {
+      await switchToBaseNetwork();
+      await window.ethereum.request({ method: "eth_requestAccounts" });
       provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
       signer = provider.getSigner();
       userAddress = await signer.getAddress();
-      await afterConnect();
-    } catch(e) {
-      alert("MetaMask connection failed: " + e.message);
-    }
-  }
 
-  // Coinbase Wallet
-  async function connectCoinbase() {
-    walletModal.classList.remove('active');
-    try {
-      const APP_NAME = 'POOL Token Presale';
-      const APP_LOGO_URL = 'https://pooltoken.example/logo.png'; // میتونی تغییر بدی
-      const DEFAULT_ETH_JSONRPC_URL = 'https://mainnet.infura.io/v3/INFURA_PROJECT_ID'; // اینجا شناسه اینفورا باید جایگزین بشه
-      const DEFAULT_CHAIN_ID = 1;
+      presaleContract = new ethers.Contract(contractAddress, abi, signer);
+      tokenContract = new ethers.Contract(tokenAddress, [
+        "function balanceOf(address) view returns (uint256)",
+        "function decimals() view returns (uint8)"
+      ], provider);
 
-      coinbaseWallet = new CoinbaseWalletSDK({
-        appName: APP_NAME,
-        appLogoUrl: APP_LOGO_URL,
-        darkMode: true
-      });
-
-      provider = new ethers.providers.Web3Provider(
-        coinbaseWallet.makeWeb3Provider(DEFAULT_ETH_JSONRPC_URL, DEFAULT_CHAIN_ID)
-      );
-
-      // درخواست حساب
-      await provider.send("eth_requestAccounts", []);
-      signer = provider.getSigner();
-      userAddress = await signer.getAddress();
-      await afterConnect();
-
-      // اگر کاربر اتصال را قطع کرد
-      coinbaseWallet.on('disconnect', () => {
-        resetConnection();
-      });
-
+      walletAddressEl.textContent = "Wallet: " + shortenAddress(userAddress);
+      await loadRate();
+      await loadBalances();
+      statusEl.textContent = "";
     } catch (e) {
-      alert("Coinbase Wallet connection failed: " + e.message);
+      alert("Connection failed: " + e.message);
     }
   }
 
-  // WalletConnect (برای موبایل)
   async function connectWalletConnect() {
-    walletModal.classList.remove('active');
     try {
       walletConnectProvider = new WalletConnectProvider.default({
         rpc: {
-          1: "https://mainnet.infura.io/v3/INFURA_PROJECT_ID",
-          56: "https://bsc-dataseed.binance.org/",
-          137: "https://rpc-mainnet.maticvigil.com/"
+          [BASE_CHAIN_ID]: BASE_RPC_URL
         },
+        chainId: BASE_CHAIN_ID,
       });
-
       await walletConnectProvider.enable();
-
       provider = new ethers.providers.Web3Provider(walletConnectProvider);
       signer = provider.getSigner();
       userAddress = await signer.getAddress();
 
+      presaleContract = new ethers.Contract(contractAddress, abi, signer);
+      tokenContract = new ethers.Contract(tokenAddress, [
+        "function balanceOf(address) view returns (uint256)",
+        "function decimals() view returns (uint8)"
+      ], provider);
+
+      walletAddressEl.textContent = "Wallet: " + shortenAddress(userAddress);
+      await loadRate();
+      await loadBalances();
+
       walletConnectProvider.on("disconnect", () => {
-        resetConnection();
+        walletAddressEl.textContent = "Wallet: Not connected";
+        userBalanceEl.textContent = "Your POOL Balance: 0";
+        contractBalanceEl.textContent = "Tokens Left in Presale: 0";
+        rateInfoEl.textContent = "Rate: Loading...";
+        statusEl.textContent = "";
       });
 
-      await afterConnect();
-    } catch(e) {
-      alert("WalletConnect connection failed: " + e.message);
-    }
-  }
-
-  async function afterConnect() {
-    walletAddressEl.innerText = "Wallet: " + shortenAddress(userAddress);
-    connectBtn.innerText = "Connected";
-    connectBtn.disabled = true;
-    connectBtn.style.cursor = "default";
-
-    presaleContract = new ethers.Contract(contractAddress, abi, signer);
-    await loadBalances();
-    await loadRate();
-
-    if(window.ethereum && window.ethereum.on) {
-      window.ethereum.on('accountsChanged', async (accounts) => {
-        if(accounts.length === 0) {
-          resetConnection();
-        } else {
-          userAddress = accounts[0];
-          walletAddressEl.innerText = "Wallet: " + shortenAddress(userAddress);
-          await loadBalances();
-        }
-      });
-      window.ethereum.on('chainChanged', () => {
-        window.location.reload();
-      });
-    }
-  }
-
-  function resetConnection() {
-    userAddress = null;
-    walletAddressEl.innerText = "Wallet: Not connected";
-    userBalanceEl.innerText = "Your POOL Balance: 0";
-    contractBalanceEl.innerText = "Tokens Left in Presale: 0";
-    rateInfoEl.innerText = "Rate: Loading...";
-    connectBtn.innerText = "Connect Wallet";
-    connectBtn.disabled = false;
-    connectBtn.style.cursor = "pointer";
-    statusEl.innerText = "";
-
-    if(walletConnectProvider) {
-      walletConnectProvider.disconnect();
-      walletConnectProvider = null;
-    }
-    if(coinbaseWallet) {
-      coinbaseWallet.disconnect();
-      coinbaseWallet = null;
+      statusEl.textContent = "";
+    } catch (e) {
+      alert("WalletConnect failed: " + e.message);
     }
   }
 
   async function loadRate() {
     try {
       const tokensPerEther = await presaleContract.TOKENS_PER_ETHER();
-      const decimals = await getTokenDecimals();
+      const decimals = await tokenContract.decimals();
       const formattedRate = ethers.utils.formatUnits(tokensPerEther, decimals);
-      rateInfoEl.innerText = "Rate: 1 ETH = " + formattedRate + " POOL";
+      rateInfoEl.textContent = "Rate: 1 ETH = " + formattedRate + " POOL";
     } catch (e) {
-      rateInfoEl.innerText = "Rate: Error loading";
+      rateInfoEl.textContent = "Rate: Error loading";
       console.error(e);
     }
   }
 
-  async function getTokenDecimals() {
-    const tokenAbi = ["function decimals() view returns (uint8)"];
-    tokenContract = new ethers.Contract(tokenAddress, tokenAbi, provider);
-    return await tokenContract.decimals();
-  }
-
   async function loadBalances() {
-    if(!userAddress) return;
     try {
-      const tokenAbi = [
-        "function balanceOf(address) view returns (uint256)",
-        "function decimals() view returns (uint8)"
-      ];
-      tokenContract = new ethers.Contract(tokenAddress, tokenAbi, provider);
-
       const decimals = await tokenContract.decimals();
       const userBal = await tokenContract.balanceOf(userAddress);
-      userBalanceEl.innerText = "Your POOL Balance: " + ethers.utils.formatUnits(userBal, decimals);
+      userBalanceEl.textContent = "Your POOL Balance: " + ethers.utils.formatUnits(userBal, decimals);
 
       const contractBal = await tokenContract.balanceOf(contractAddress);
-      contractBalanceEl.innerText = "Tokens Left in Presale: " + ethers.utils.formatUnits(contractBal, decimals);
+      contractBalanceEl.textContent = "Tokens Left in Presale: " + ethers.utils.formatUnits(contractBal, decimals);
     } catch (e) {
       console.error(e);
-      userBalanceEl.innerText = "Your POOL Balance: Error";
-      contractBalanceEl.innerText = "Tokens Left in Presale: Error";
+      userBalanceEl.textContent = "Your POOL Balance: Error";
+      contractBalanceEl.textContent = "Tokens Left in Presale: Error";
     }
   }
 
   async function buyTokens() {
-    if(!userAddress) {
+    if (!userAddress) {
       alert("Please connect your wallet first!");
       return;
     }
-    const ethAmount = document.getElementById('ethAmount').value;
-    if(!ethAmount || ethAmount < 0.02) {
+    const ethAmount = document.getElementById("ethAmount").value;
+    if (!ethAmount || parseFloat(ethAmount) < 0.02) {
       alert("Minimum purchase is 0.02 ETH");
       return;
     }
     try {
-      statusEl.style.color = "#facc15";
-      statusEl.innerText = "Transaction sent. Waiting for confirmation...";
-      const tx = await presaleContract.buyTokens({ value: ethers.utils.parseEther(ethAmount) });
+      statusEl.style.color = "#facc15"; // yellow
+      statusEl.textContent = "Transaction sent. Waiting for confirmation...";
+      const tx = await presaleContract.buyTokens({
+        value: ethers.utils.parseEther(ethAmount)
+      });
       await tx.wait();
       statusEl.style.color = "#4ade80"; // green
-      statusEl.innerText = "Purchase successful!";
+      statusEl.textContent = "Purchase successful!";
       await loadBalances();
     } catch (e) {
       statusEl.style.color = "#f87171"; // red
-      statusEl.innerText = "Transaction failed: " + e.message;
+      statusEl.textContent = "Transaction failed: " + e.message;
     }
   }
 
-  // Button event listeners
-  document.getElementById('metaMaskBtn').addEventListener('click', connectMetaMask);
-  document.getElementById('coinbaseBtn').addEventListener('click', connectCoinbase);
-  document.getElementById('walletConnectBtn').addEventListener('click', connectWalletConnect);
-  buyBtn.addEventListener('click', buyTokens);
-
+  document.getElementById("connectMetaMaskBtn").onclick = connectMetaMask;
+  document.getElementById("connectWalletConnectBtn").onclick = connectWalletConnect;
+  document.getElementById("buyBtn").onclick = buyTokens;
 </script>
 
 </body>
